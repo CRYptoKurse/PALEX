@@ -61,16 +61,14 @@ class Scanner:
 
     # ---------- Внутренние методы ----------
     def _advance(self) -> str:
-        """Возвращает текущий символ и сдвигает позицию, учитывая \r\n."""
         ch = self.source[self.pos]
         self.pos += 1
         if ch == '\n':
             self.line += 1
             self.column = 1
         elif ch == '\r':
-            # пропускаем, но если за ним \n – он будет обработан как \n
             if self.pos < len(self.source) and self.source[self.pos] == '\n':
-                self.pos += 1
+                self.pos += 1  # пропускаем \n после \r
             self.line += 1
             self.column = 1
         else:
@@ -108,7 +106,6 @@ class Scanner:
         lexeme = self.source[start:self.pos]
         if len(lexeme) > 255:
             self._error(line, col, f"Identifier too long (max 255): '{lexeme[:20]}...'")
-            # всё равно возвращаем идентификатор
         if lexeme in self._keywords:
             tok_type = self._keywords[lexeme]
             lit = True if lexeme == 'true' else False if lexeme == 'false' else None
@@ -120,7 +117,6 @@ class Scanner:
         while not self.is_at_end() and self._peek_char().isdigit():
             self._advance()
         if self._peek_char() == '.' and self._peek_char(1).isdigit():
-            # float
             self._advance()  # точка
             while not self.is_at_end() and self._peek_char().isdigit():
                 self._advance()
@@ -132,7 +128,6 @@ class Scanner:
                 val = 0.0
             return Token(TokenType.FLOAT_LITERAL, lexeme, line, col, val)
         else:
-            # integer
             lexeme = self.source[start:self.pos]
             try:
                 val = int(lexeme)
@@ -147,19 +142,19 @@ class Scanner:
         self._advance()  # начальная кавычка
         start = self.pos
         while not self.is_at_end() and self._peek_char() != '"':
-            # упрощённо: не обрабатываем escape
             self._advance()
         if self.is_at_end():
             self._error(line, col, "Unterminated string")
-            lexeme = self.source[start:self.pos]
+            content = self.source[start:self.pos]
+            lexeme = '"' + content
         else:
-            lexeme = self.source[start:self.pos]
+            content = self.source[start:self.pos]
+            lexeme = '"' + content + '"'
             self._advance()  # закрывающая кавычка
-        return Token(TokenType.STRING_LITERAL, f'"{lexeme}"', line, col, lexeme)
-
+        return Token(TokenType.STRING_LITERAL, lexeme, line, col, content)
     def _read_operator_or_delimiter(self, line: int, col: int) -> Token:
         ch = self._advance()
-        # двусимвольные операторы
+        # Двухсимвольные операторы
         if ch == '=' and self._peek_char() == '=':
             self._advance()
             return Token(TokenType.OP_EQ, '==', line, col)
@@ -175,30 +170,47 @@ class Scanner:
         if ch == '&' and self._peek_char() == '&':
             self._advance()
             return Token(TokenType.OP_AND, '&&', line, col)
+        if ch == '|' and self._peek_char() == '|':
+            self._advance()
+            return Token(TokenType.OP_OR, '||', line, col)
+        # Составные присваивания
+        if ch == '+' and self._peek_char() == '=':
+            self._advance()
+            return Token(TokenType.ASSIGN_ADD, '+=', line, col)
+        if ch == '-' and self._peek_char() == '=':
+            self._advance()
+            return Token(TokenType.ASSIGN_SUB, '-=', line, col)
+        if ch == '*' and self._peek_char() == '=':
+            self._advance()
+            return Token(TokenType.ASSIGN_MUL, '*=', line, col)
+        if ch == '/' and self._peek_char() == '=':
+            self._advance()
+            return Token(TokenType.ASSIGN_DIV, '/=', line, col)
 
-        # односимвольные
+        # Односимвольные операторы и разделители
         single_map = {
             '+': TokenType.OP_PLUS, '-': TokenType.OP_MINUS,
             '*': TokenType.OP_STAR, '/': TokenType.OP_SLASH,
             '%': TokenType.OP_PERCENT,
             '=': TokenType.ASSIGN,
+            '!': TokenType.OP_NOT,
             '(': TokenType.LPAREN, ')': TokenType.RPAREN,
             '{': TokenType.LBRACE, '}': TokenType.RBRACE,
+            '[': TokenType.LBRACKET, ']': TokenType.RBRACKET,
             ';': TokenType.SEMICOLON, ',': TokenType.COMMA,
-            '<': TokenType.OP_LT,
-            '>': TokenType.OP_GT,
+            ':': TokenType.COLON,
+            '<': TokenType.OP_LT, '>': TokenType.OP_GT,
         }
         if ch in single_map:
             return Token(single_map[ch], ch, line, col)
 
-        # неизвестный символ -> ошибка, восстановление: пропустить один символ
+        # Неизвестный символ
         self._error(line, col, f"Invalid character: '{ch}'")
         return Token(TokenType.ERROR, ch, line, col)
 
     def _error(self, line: int, col: int, msg: str):
         self.errors.append(f"Lexical error at {line}:{col}: {msg}")
 
-    # для CLI демонстрации
     @staticmethod
     def main_cli():
         import sys

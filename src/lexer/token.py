@@ -19,14 +19,22 @@ class TokenType(Enum):
     OP_PLUS, OP_MINUS, OP_STAR, OP_SLASH, OP_PERCENT = auto(), auto(), auto(), auto(), auto()
     OP_EQ, OP_NEQ, OP_LT, OP_LE, OP_GT, OP_GE = auto(), auto(), auto(), auto(), auto(), auto()
     OP_AND = auto()
+    OP_OR = auto()          # ||
+    OP_NOT = auto()         # !
     ASSIGN = auto()
+    ASSIGN_ADD = auto()     # +=
+    ASSIGN_SUB = auto()     # -=
+    ASSIGN_MUL = auto()     # *=
+    ASSIGN_DIV = auto()     # /=
 
     # Разделители
     LPAREN, RPAREN, LBRACE, RBRACE, SEMICOLON, COMMA = auto(), auto(), auto(), auto(), auto(), auto()
+    LBRACKET, RBRACKET = auto(), auto()   # [ ]
+    COLON = auto()                         # :
 
     # Специальные
     END_OF_FILE = auto()
-    ERROR = auto()   # для сообщений об ошибках внутри потока (пропускается)
+    ERROR = auto()
 
 @dataclass
 class Token:
@@ -38,8 +46,9 @@ class Token:
 
     def __str__(self):
         line_col = f"{self.line}:{self.column}"
+        # Экранируем лексему для безопасного вывода внутри кавычек
+        escaped_lexeme = self.lexeme.replace('\\', '\\\\').replace('"', '\\"')
         if self.literal is not None:
-            # Для чисел и булевых выводим значение после лексемы
-            return f'{line_col} {self.type.name} "{self.lexeme}" {self.literal}'
+            return f'{line_col} {self.type.name} "{escaped_lexeme}" {self.literal}'
         else:
-            return f'{line_col} {self.type.name} "{self.lexeme}"'
+            return f'{line_col} {self.type.name} "{escaped_lexeme}"'
