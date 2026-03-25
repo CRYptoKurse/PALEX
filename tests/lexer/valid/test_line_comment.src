@@ -1,0 +1,2 @@
+int x = 5; // this is a comment
+float y = 3.14;

@@ -13,15 +13,11 @@ def tokenize_file(filepath):
         src = f.read()
     scanner = Scanner(src)
     tokens = []
-    while not scanner.is_at_end():
+    while True:
         tok = scanner.next_token()
-        tokens.append(str(tok))   # больше не фильтруем ERROR
-    # EOF добавляется автоматически внутри next_token() при is_at_end()
-    # Однако мы уже вышли из цикла, поэтому нужно взять последний токен?
-    # Упростим: в scanner.next_token() при достижении конца возвращается END_OF_FILE.
-    # Но цикл закончится, когда scanner.is_at_end() станет True,
-    # при этом последний вызов next_token() уже вернул END_OF_FILE.
-    # Значит, в списке tokens уже есть END_OF_FILE. Дублировать не нужно.
+        tokens.append(str(tok))
+        if tok.type == TokenType.END_OF_FILE:
+            break
     return '\n'.join(tokens)
 def run_tests():
     passed = 0
