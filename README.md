@@ -457,15 +457,3 @@ python test_runner/run_tests.py
 python src/main.py -i examples/program.src --ast-format text
 ```
 
-## License
-
-Educational project - MiniCompiler Sprint 2
-
-## Author
-
-Assistant (Copilot)
-
----
-
-**Last Updated:** May 24, 2026  
-**Status:** Sprint 2 Complete ✅
