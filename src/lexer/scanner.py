@@ -1,7 +1,7 @@
 import re
 from typing import Optional, List
-from .token import Token, TokenType
-from .preprocessor import Preprocessor
+from src.lexer.token import Token, TokenType
+from src.lexer.preprocessor import Preprocessor
 
 class Scanner:
     def __init__(self, source: str, use_preprocessor: bool = True):
@@ -18,7 +18,6 @@ class Scanner:
         self.errors: List[str] = []
         self._peek_token: Optional[Token] = None
 
-    # ---------- Интерфейс (LEX‑2) ----------
     def is_at_end(self) -> bool:
         return self.pos >= len(self.source)
 
@@ -33,19 +32,12 @@ class Scanner:
         start_line, start_col = self.line, self.column
         ch = self._peek_char()
 
-        # --- Ключевые слова и идентификаторы ---
         if ch.isalpha() or ch == '_':
             return self._read_identifier_or_keyword(start_line, start_col)
-
-        # --- Числовые литералы ---
         if ch.isdigit():
             return self._read_number(start_line, start_col)
-
-        # --- Строковые литералы ---
         if ch == '"':
             return self._read_string(start_line, start_col)
-
-        # --- Операторы и разделители ---
         return self._read_operator_or_delimiter(start_line, start_col)
 
     def peek_token(self) -> Token:
@@ -59,7 +51,6 @@ class Scanner:
     def get_column(self) -> int:
         return self.column
 
-    # ---------- Внутренние методы ----------
     def _advance(self) -> str:
         ch = self.source[self.pos]
         self.pos += 1
@@ -68,7 +59,7 @@ class Scanner:
             self.column = 1
         elif ch == '\r':
             if self.pos < len(self.source) and self.source[self.pos] == '\n':
-                self.pos += 1  # пропускаем \n после \r
+                self.pos += 1
             self.line += 1
             self.column = 1
         else:
@@ -88,7 +79,6 @@ class Scanner:
             else:
                 break
 
-    # --- Распознавание токенов ---
     _keywords = {
         'if': TokenType.KW_IF, 'else': TokenType.KW_ELSE,
         'while': TokenType.KW_WHILE, 'for': TokenType.KW_FOR,
@@ -117,7 +107,7 @@ class Scanner:
         while not self.is_at_end() and self._peek_char().isdigit():
             self._advance()
         if self._peek_char() == '.' and self._peek_char(1).isdigit():
-            self._advance()  # точка
+            self._advance()
             while not self.is_at_end() and self._peek_char().isdigit():
                 self._advance()
             lexeme = self.source[start:self.pos]
@@ -139,7 +129,7 @@ class Scanner:
             return Token(TokenType.INT_LITERAL, lexeme, line, col, val)
 
     def _read_string(self, line: int, col: int) -> Token:
-        self._advance()  # начальная кавычка
+        self._advance()
         start = self.pos
         while not self.is_at_end() and self._peek_char() != '"':
             self._advance()
@@ -150,11 +140,16 @@ class Scanner:
         else:
             content = self.source[start:self.pos]
             lexeme = '"' + content + '"'
-            self._advance()  # закрывающая кавычка
+            self._advance()
         return Token(TokenType.STRING_LITERAL, lexeme, line, col, content)
+
     def _read_operator_or_delimiter(self, line: int, col: int) -> Token:
         ch = self._advance()
-        # Двухсимвольные операторы
+        # Arrow ->
+        if ch == '-' and self._peek_char() == '>':
+            self._advance()
+            return Token(TokenType.ARROW, '->', line, col)
+        # Two‑character operators
         if ch == '=' and self._peek_char() == '=':
             self._advance()
             return Token(TokenType.OP_EQ, '==', line, col)
@@ -173,7 +168,6 @@ class Scanner:
         if ch == '|' and self._peek_char() == '|':
             self._advance()
             return Token(TokenType.OP_OR, '||', line, col)
-        # Составные присваивания
         if ch == '+' and self._peek_char() == '=':
             self._advance()
             return Token(TokenType.ASSIGN_ADD, '+=', line, col)
@@ -187,7 +181,6 @@ class Scanner:
             self._advance()
             return Token(TokenType.ASSIGN_DIV, '/=', line, col)
 
-        # Односимвольные операторы и разделители
         single_map = {
             '+': TokenType.OP_PLUS, '-': TokenType.OP_MINUS,
             '*': TokenType.OP_STAR, '/': TokenType.OP_SLASH,
@@ -204,7 +197,6 @@ class Scanner:
         if ch in single_map:
             return Token(single_map[ch], ch, line, col)
 
-        # Неизвестный символ
         self._error(line, col, f"Invalid character: '{ch}'")
         return Token(TokenType.ERROR, ch, line, col)
 
