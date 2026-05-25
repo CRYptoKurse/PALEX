@@ -1,0 +1,6 @@
+fn main() -> int {
+    int a = -42;
+    int b = +5;
+    bool c = !true;
+    return a;
+}
