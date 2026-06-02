@@ -1,0 +1,6 @@
+fn main() -> int {
+    int x = 5 + 3 * 2 - 8 / 4;
+    int y = (5 + 3) * 2;
+    bool b = 1 == 2 && 3 < 4 || !false;
+    return x;
+}

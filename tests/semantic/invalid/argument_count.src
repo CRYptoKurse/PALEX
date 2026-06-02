@@ -1,0 +1,8 @@
+fn greet(int value) -> void {
+    return;
+}
+
+fn main() -> int {
+    greet();
+    return 0;
+}
