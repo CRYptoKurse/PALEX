@@ -1,0 +1,23 @@
+fn isPrime(int n) -> bool {
+    if (n < 2) {
+        return false;
+    }
+    int i = 2;
+    while (i * i <= n) {
+        if (n % i == 0) {
+            return false;
+        }
+        i = i + 1;
+    }
+    return true;
+}
+
+fn main() -> int {
+    int result = 0;
+    if (isPrime(7)) {
+        result = 1;
+    } else {
+        result = 0;
+    }
+    return result;
+}

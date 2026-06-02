@@ -1,0 +1,9 @@
+fn divide_by_zero() -> int {
+    int x = 10;
+    int y = 0;
+    return x / y;
+}
+
+fn main() -> int {
+    return divide_by_zero();
+}

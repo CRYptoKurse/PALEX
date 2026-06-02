@@ -1,0 +1,12 @@
+fn main() -> int {
+    bool a = false;
+    bool b = true;
+    int x = 0;
+    if (a && (x / 0 > 0)) {
+        return 1;
+    }
+    if (b || (x / 0 > 0)) {
+        return 2;
+    }
+    return 0;
+}

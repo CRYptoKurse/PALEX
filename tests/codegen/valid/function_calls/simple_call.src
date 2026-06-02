@@ -1,0 +1,8 @@
+fn subtract(int a, int b) -> int {
+    return a - b;
+}
+
+fn main() -> int {
+    int result = subtract(10, 3);
+    return result;
+}

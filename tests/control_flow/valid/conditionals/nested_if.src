@@ -1,0 +1,15 @@
+fn main() -> int {
+    int a = 3;
+    int b = 5;
+    int result = 0;
+    if (a < b) {
+        if (b < 10) {
+            result = 1;
+        } else {
+            result = 2;
+        }
+    } else {
+        result = 3;
+    }
+    return result;
+}

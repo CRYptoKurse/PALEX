@@ -1,0 +1,27 @@
+function factorial: int (int n)
+  entry:
+    n_0 = ALLOCA  1  # param n
+    t1 = LOAD  [n_0]  # load n
+    t2 = CMP_LE  t1, 1  # <= (type=bool)
+    JUMP_IF  t2, L_then_1  # if true
+    JUMP  L_else_2  # if false
+  L_then_1:
+    RETURN  1
+  L_else_2:
+    t3 = LOAD  [n_0]  # load n
+    t4 = LOAD  [n_0]  # load n
+    t5 = SUB  t4, 1  # - (type=int)
+    PARAM  0, t5  # param 0
+    t6 = CALL  factorial, t5  # function call (type=int)
+    t7 = MUL  t3, t6  # * (type=int)
+    RETURN  t7
+  L_endif_3:
+
+function main: int ()
+  entry:
+    f_1 = ALLOCA  1  # var f
+    PARAM  0, 5  # param 0
+    t8 = CALL  factorial, 5  # function call (type=int)
+    STORE  [f_1], t8  # f = init
+    t9 = LOAD  [f_1]  # load f
+    RETURN  t9

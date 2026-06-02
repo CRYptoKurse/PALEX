@@ -1,0 +1,10 @@
+fn stack_overflow(int n) -> int {
+    if (n <= 0) {
+        return 1;
+    }
+    return stack_overflow(n + 1);
+}
+
+fn main() -> int {
+    return stack_overflow(0);
+}

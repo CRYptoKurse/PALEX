@@ -1,0 +1,11 @@
+function main: int ()
+  entry:
+    a_1 = ALLOCA  1  # var a
+    t1 = ADD  2, 3  # + (type=int)
+    STORE  [a_1], t1  # a = init
+    b_1 = ALLOCA  1  # var b
+    t2 = LOAD  [a_1]  # load a
+    t3 = MUL  t2, 4  # * (type=int)
+    STORE  [b_1], t3  # b = init
+    t4 = LOAD  [b_1]  # load b
+    RETURN  t4

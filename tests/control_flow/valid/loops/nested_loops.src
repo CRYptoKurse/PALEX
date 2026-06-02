@@ -1,0 +1,11 @@
+fn main() -> int {
+    int sum = 0;
+    for (int i = 0; i < 3; i = i + 1) {
+        int local = 1;
+        while (local <= i) {
+            sum = sum + local;
+            local = local + 1;
+        }
+    }
+    return sum;
+}

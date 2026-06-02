@@ -1,0 +1,18 @@
+function add: int (int a, int b)
+  entry:
+    a_0 = ALLOCA  1  # param a
+    b_0 = ALLOCA  1  # param b
+    t1 = LOAD  [a_0]  # load a
+    t2 = LOAD  [b_0]  # load b
+    t3 = ADD  t1, t2  # + (type=int)
+    RETURN  t3
+
+function main: int ()
+  entry:
+    result_1 = ALLOCA  1  # var result
+    PARAM  0, 2  # param 0
+    PARAM  1, 3  # param 1
+    t4 = CALL  add, 2, 3  # function call (type=int)
+    STORE  [result_1], t4  # result = init
+    t5 = LOAD  [result_1]  # load result
+    RETURN  t5
