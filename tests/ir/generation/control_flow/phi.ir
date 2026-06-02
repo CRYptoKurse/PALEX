@@ -1,0 +1,21 @@
+function main: int ()
+  entry:
+    x_1 = ALLOCA  1  # var x
+    STORE  [x_1], 1  # x = init
+    t1 = LOAD  [x_1]  # load x
+    t2 = CMP_LT  t1, 2  # < (type=bool)
+    JUMP_IF  t2, L_then_1  # if true
+    JUMP  L_else_2  # if false
+  L_then_1:
+    STORE  [x_1], 10  # x =
+    t3 = MOVE  10  # assignment result (type=int)
+    JUMP  L_endif_3
+  L_else_2:
+    STORE  [x_1], 20  # x =
+    t4 = MOVE  20  # assignment result (type=int)
+    JUMP  L_endif_3
+  L_endif_3:
+    t5 = PHI  (t3, L_then_1), (t4, L_else_2)  # phi x
+    STORE  [x_1], t5  # x = phi
+    t6 = LOAD  [x_1]  # load x
+    RETURN  t6

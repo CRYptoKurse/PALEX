@@ -1,0 +1,11 @@
+fn check_bounds(int index) -> int {
+    int arr = 5;
+    if (index >= arr) {
+        return 0;
+    }
+    return 1;
+}
+
+fn main() -> int {
+    return check_bounds(100);
+}
